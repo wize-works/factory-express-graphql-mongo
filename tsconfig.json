@@ -1,0 +1,36 @@
+{
+    "compilerOptions": {
+        /* Build */
+        "outDir": "dist",
+        "rootDir": ".",
+        /* Language and environment */
+        "target": "ES2021",
+        "lib": [
+            "ES2021"
+        ],
+        "module": "ESNext",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        /* Interop */
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
+        "types": [
+            "node"
+        ],
+        /* Strictness */
+        "strict": true,
+        "skipLibCheck": true,
+        /* Source maps for better debugging */
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true
+    },
+    "include": [
+        "./src/**/*",
+        "./examples/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
+    ]
+}

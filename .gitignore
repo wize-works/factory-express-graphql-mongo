@@ -1,0 +1,44 @@
+# Node & package tooling
+node_modules/
+
+# Build output
+/dist/
+
+# TypeScript
+*.tsbuildinfo
+
+# Test & coverage
+/coverage/
+.vitest/
+
+# Environment files
+.env*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor junk
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# macOS metadata
+.AppleDouble
+.LSOverride
+
+# Optional npm cache directory
+.npm/
+
+# tsup temp
+*.tmp
+
+# Semantic‑release artifacts
+/.releaserc.local
+
+# VSCode test workspace settings
+*.code-workspace
+
