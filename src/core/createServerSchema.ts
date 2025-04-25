@@ -1,51 +1,65 @@
 // src/core/createServerSchema.ts
-import { GraphQLObjectType, GraphQLSchema } from 'graphql';
+
+import { GraphQLSchema, GraphQLObjectType } from 'graphql';
+import { MongoClient } from 'mongodb';
 import { GraphQLModel } from '../models/types';
 import { generateResolvers } from '../generators/generateResolvers';
-import { PubSub } from 'graphql-subscriptions';
+import { loadSchemasFromMongo } from '../utils/loadSchemas';
 
-const pubsub = new PubSub();
+interface CreateSchemaOptions {
+    mongo: MongoClient;
+    tenantId: string;
+    clientApp: string;
+}
 
-export function createServerSchema(models: GraphQLModel[]) {
-    const queryFields: any = {};
-    const mutationFields: any = {};
-    const subscriptionFields: any = {};
+/**
+ * Builds a GraphQLSchema by loading persisted schemas from MongoDB
+ * for the given tenantId and clientApp, generating resolvers, and
+ * assembling the Query and Mutation types.
+ */
+export async function createServerSchema({
+    mongo,
+    tenantId,
+    clientApp,
+}: CreateSchemaOptions): Promise<GraphQLSchema> {
+    // 1) Load dynamic schemas
+    const persisted = await loadSchemasFromMongo(mongo, tenantId, clientApp);
+
+    // 2) Map to in-memory GraphQLModel
+    const models: GraphQLModel[] = persisted.map(doc => ({
+        name: doc.name,
+        collection: doc.name.toLowerCase(),
+        fields: doc.metadata.fields,
+    }));
+
+    // 3) Generate resolver maps
+    const queryFields: Record<string, any> = {};
+    const mutationFields: Record<string, any> = {};
 
     for (const model of models) {
         const resolvers = generateResolvers(model);
-
-        for (const [key, config] of Object.entries(resolvers)) {
-            if (key.startsWith('find')) {
-                queryFields[key] = config;
-            } else if (key.startsWith('subscribe')) {
-                subscriptionFields[key] = {
-                    subscribe: config.subscribe,
-                    resolve: config.resolve,
-                };
+        for (const [fieldName, fieldConfig] of Object.entries(resolvers)) {
+            if (fieldName.startsWith('find')) {
+                queryFields[fieldName] = fieldConfig;
             } else {
-                mutationFields[key] = config;
+                mutationFields[fieldName] = fieldConfig;
             }
         }
     }
 
+    // 4) Construct root types
     const Query = new GraphQLObjectType({
         name: 'Query',
         fields: queryFields,
     });
-
     const Mutation = new GraphQLObjectType({
         name: 'Mutation',
         fields: mutationFields,
     });
 
-    const Subscription = new GraphQLObjectType({
-        name: 'Subscription',
-        fields: subscriptionFields,
-    });
-
+    // 5) Return assembled schema
     return new GraphQLSchema({
         query: Query,
         mutation: Mutation,
-        subscription: Subscription,
     });
 }
