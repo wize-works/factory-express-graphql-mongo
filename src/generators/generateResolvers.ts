@@ -1,6 +1,6 @@
 // src/generators/generateResolvers.ts
 import { GraphQLFieldConfigMap, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from 'graphql';
-import { GraphQLFactoryContext } from '../core/context';
+import { GraphQLFactoryContext } from '../interfaces/GraphQLFactoryContext';
 import { GraphQLModel } from '../models/types';
 import { generateObjectType, generateInputType } from './generateTypes';
 import { generateFilterInput } from './generateFilters';

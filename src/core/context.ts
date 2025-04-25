@@ -1,23 +1,9 @@
 
 import { MongoClient } from 'mongodb';
 import { YogaInitialContext } from 'graphql-yoga';
-
-export interface ILogger {
-    log: (msg: string, meta?: Record<string, unknown>) => void;
-    error: (msg: string, meta?: Record<string, unknown>) => void;
-}
-
-export interface ITracer {
-    trace: (span: string, meta?: Record<string, unknown>) => void;
-}
-
-export interface GraphQLFactoryContext {
-    tenantId: string;
-    tenantName: string;
-    db: MongoClient;
-    logger: ILogger;
-    tracer: ITracer;
-}
+import { ILogger } from '../interfaces/ILogger';
+import { ITracer } from '../interfaces/ITracer';
+import { GraphQLFactoryContext } from '../interfaces/GraphQLFactoryContext';
 
 export function createContext(mongo: MongoClient, logger: ILogger, tracer: ITracer) {
     return async function ({ request }: YogaInitialContext): Promise<GraphQLFactoryContext> {
